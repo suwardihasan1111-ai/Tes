@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrumen Evaluasi: Literasi, Logika & Berpikir Kritis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .intro {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #7f8c8d;
+        }
+        .question-card {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+        }
+        .question-card:last-child {
+            border-bottom: none;
+        }
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .options label:hover {
+            background: #e9ecef;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
+        #result-container {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f8f5;
+            border-radius: 8px;
+            border: 1px solid #1abc9c;
+        }
+        .score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #16a085;
+        }
+        .feedback {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        .category-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+        .cat-literasi { background-color: #8e44ad; }
+        .cat-logika { background-color: #d35400; }
+        .cat-kritis { background-color: #c0392b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Instrumen Evaluasi Kompetensi</h1>
+    <p class="intro">Uji Literasi, Logika Analitik, dan Berpikir Kritis<br>Total 30 Pertanyaan. Pilih satu jawaban yang paling tepat.</p>
+
+    <form id="quizForm">
+        <div id="questions-container"></div>
+        <button type="button" onclick="calculateScore()">Selesaikan Tes & Lihat Hasil</button>
+    </form>
+
+    <div id="result-container">
+        <h2>Hasil Evaluasi</h2>
+        <div class="score" id="score-display">0/30</div>
+        <div class="feedback" id="feedback-display"></div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        // --- LITERASI (1-10) ---
+        {
+            category: "Literasi",
+            question: "Makna kata 'fluktuasi' dalam konteks ekonomi yang paling tepat adalah...",
+            options: [
+                "A. Penurunan harga secara drastis secara terus-menerus.",
+                "B. Keadaan turun naiknya harga atau keadaan yang tidak tetap.",
+                "C. Penetapan harga oleh pemerintah pusat.",
+                "D. Stagnasi ekonomi pada suatu periode tertentu."
+            ],
+            answer: 1
+        },
+        {
+            category: "Literasi",
+            question: "Bacalah kutipan berikut: 'Banyak pakar menyarankan agar warga mulai beralih ke kendaraan listrik guna menekan emisi karbon, meskipun infrastruktur pengisian daya belum merata.' Ide pokok kalimat tersebut adalah...",
+            options: [
+                "A. Infrastruktur kendaraan listrik yang belum merata.",
+                "B. Alasan kendaraan listrik mahal.",
+                "C. Imbauan beralih ke kendaraan listrik untuk menekan emisi karbon.",
+                "D. Pendapat pakar mengenai emisi karbon."
+            ],
+            answer: 2
+        },
+        {
+            category: "Literasi",
+            question: "Analogi yang paling tepat untuk <b>GURU : SEKOLAH</b> adalah...",
+            options: [
+                "A. Petani : Traktor",
+                "B. Dokter : Rumah Sakit",
+                "C. Buku : Perpustakaan",
+                "D. Resep : Apotek"
+            ],
+            answer: 1
+        },
+        {
+            category: "Literasi",
+            question: "Penulisan huruf kapital yang benar menurut PUEBI terdapat pada kalimat...",
+            options: [
+                "A. Ayah membaca surat kabar kompas di teras.",
+                "B. Kami akan mendaki Gunung Merapi pada bulan Agustus.",
+                "C. Paman membeli pisang Ambon di pasar.",
+                "D. presiden meresmikan jalan tol baru kemarin."
+            ],
+            answer: 1
+        },
+        {
+            category: "Literasi",
+            question: "Manakah kalimat berikut yang merupakan sebuah opini?",
+            options: [
+                "A. Air mendidih pada suhu 100 derajat Celcius di tekanan 1 atm.",
+                "B. Ibukota Indonesia saat ini sedang dalam proses pemindahan.",
+                "C. Matematika adalah mata pelajaran yang paling menyenangkan.",
+                "D. Jarak antara Bumi dan Matahari sekitar 149,6 juta kilometer."
+            ],
+            answer: 2
+        },
+        {
+            category: "Literasi",
+            question: "Antonim yang paling tepat untuk kata 'Skeptis' adalah...",
+            options: [
+                "A. Ragu-ragu",
+                "B. Pesimis",
+                "C. Yakin",
+                "D. Acuh"
+            ],
+            answer: 2
+        },
+        {
+            category: "Literasi",
+            question: "Makna konotatif dari ungkapan 'kambing hitam' adalah...",
+            options: [
+                "A. Orang yang selalu berbuat salah.",
+                "B. Orang yang dijadikan tumpuan kesalahan yang tidak dilakukannya.",
+                "C. Hewan ternak yang berbulu hitam gelap.",
+                "D. Pekerja keras yang tidak dihargai."
+            ],
+            answer: 1
+        },
+        {
+            category: "Literasi",
+            question: "Kalimat yang <b>tidak</b> efektif adalah...",
+            options: [
+                "A. Kepada para mahasiswa diharap segera berkumpul di aula.",
+                "B. Para mahasiswa diharap segera berkumpul di aula.",
+                "C. Mahasiswa diharapkan segera berkumpul di aula.",
+                "D. Kami berharap mahasiswa berkumpul di aula."
+            ],
+            answer: 0
+        },
+        {
+            category: "Literasi",
+            question: "Teks berita yang baik harus mengandung unsur 5W+1H. Kalimat 'Peristiwa itu terjadi kemarin sore di persimpangan jalan' menjawab unsur...",
+            options: [
+                "A. Apa dan Siapa (What & Who)",
+                "B. Mengapa dan Bagaimana (Why & How)",
+                "C. Kapan dan Di mana (When & Where)",
+                "D. Siapa dan Kapan (Who & When)"
+            ],
+            answer: 2
+        },
+        {
+            category: "Literasi",
+            question: "Dalam sebuah esai argumentatif, bagian konklusi berfungsi untuk...",
+            options: [
+                "A. Memperkenalkan argumen baru yang belum dibahas.",
+                "B. Merangkum gagasan utama dan menegaskan kembali tesis.",
+                "C. Menyajikan data statistik secara mendetail.",
+                "D. Menyerang karakter dari pihak yang berlawanan."
+            ],
+            answer: 1
+        },
+
+        // --- LOGIKA (11-20) ---
+        {
+            category: "Logika",
+            question: "Semua mamalia bernapas dengan paru-paru. Lumba-lumba adalah mamalia. Kesimpulan yang tepat adalah...",
+            options: [
+                "A. Lumba-lumba bernapas dengan insang.",
+                "B. Sebagian lumba-lumba bernapas dengan paru-paru.",
+                "C. Lumba-lumba bernapas dengan paru-paru.",
+                "D. Tidak dapat ditarik kesimpulan."
+            ],
+            answer: 2
+        },
+        {
+            category: "Logika",
+            question: "Jika hujan turun, maka jalanan akan basah. Saat ini jalanan tidak basah. Kesimpulan logisnya adalah...",
+            options: [
+                "A. Hujan akan segera turun.",
+                "B. Saat ini hujan turun rintik-rintik.",
+                "C. Saat ini hujan tidak turun.",
+                "D. Jalanan kering karena panas matahari."
+            ],
+            answer: 2
+        },
+        {
+            category: "Logika",
+            question: "Lengkapi deret angka berikut: 2, 6, 12, 20, 30, ...",
+            options: [
+                "A. 38",
+                "B. 40",
+                "C. 42",
+                "D. 44"
+            ],
+            answer: 2
+        },
+        {
+            category: "Logika",
+            question: "Andi lebih tinggi dari Budi. Cici lebih tinggi dari Andi. Dedi lebih pendek dari Budi. Siapa yang paling tinggi?",
+            options: [
+                "A. Andi",
+                "B. Budi",
+                "C. Cici",
+                "D. Dedi"
+            ],
+            answer: 2
+        },
+        {
+            category: "Logika",
+            question: "Tidak ada ikan yang bernapas dengan paru-paru (Pengecualian biologi diabaikan demi logika formal). Paus bernapas dengan paru-paru. Kesimpulannya adalah...",
+            options: [
+                "A. Paus adalah ikan.",
+                "B. Paus bukan ikan.",
+                "C. Sebagian ikan adalah paus.",
+                "D. Beberapa paus bernapas tanpa paru-paru."
+            ],
+            answer: 1
+        },
+        {
+            category: "Logika",
+            question: "Lima orang siswa (A, B, C, D, E) duduk di kursi berderet. A tidak duduk di ujung. B duduk tepat di sebelah kanan C. D duduk di ujung kiri. Jika E duduk di sebelah kanan A, di manakah B duduk?",
+            options: [
+                "A. Di antara D dan A",
+                "B. Di ujung kanan",
+                "C. Di antara E dan C",
+                "D. Di sebelah kiri A"
+            ],
+            answer: 0 
+        },
+        {
+            category: "Logika",
+            question: "Sebagian karyawan memakai kacamata. Semua yang memakai kacamata terlihat cerdas. Kesimpulannya...",
+            options: [
+                "A. Semua karyawan terlihat cerdas.",
+                "B. Semua yang terlihat cerdas adalah karyawan.",
+                "C. Sebagian karyawan terlihat cerdas.",
+                "D. Tidak ada karyawan yang terlihat cerdas."
+            ],
+            answer: 2
+        },
+        {
+            category: "Logika",
+            question: "Lengkapi deret huruf berikut: A, D, G, J, M, ...",
+            options: [
+                "A. N",
+                "B. O",
+                "C. P",
+                "D. Q"
+            ],
+            answer: 2
+        },
+        {
+            category: "Logika",
+            question: "Premis 1: Jika saya lulus ujian, ayah akan membelikan sepeda. Premis 2: Ayah membelikan saya sepeda. Manakah pernyataan yang benar menurut logika formal?",
+            options: [
+                "A. Saya pasti lulus ujian.",
+                "B. Kesimpulan tidak dapat dipastikan (Affirming the consequent).",
+                "C. Saya tidak lulus ujian.",
+                "D. Ayah membelikan sepeda karena kasihan."
+            ],
+            answer: 1
+        },
+        {
+            category: "Logika",
+            question: "Syarat beasiswa adalah IPK > 3.00 dan Skor TOEFL > 500. Rina memiliki IPK 3.50 dan TOEFL 480. Kesimpulan yang tepat...",
+            options: [
+                "A. Rina berhak mendapatkan beasiswa.",
+                "B. Rina berhak mendapatkan setengah beasiswa.",
+                "C. Rina tidak berhak mendapatkan beasiswa.",
+                "D. Syarat beasiswa harus diubah."
+            ],
+            answer: 2
+        },
+
+        // --- BERPIKIR KRITIS (21-30) ---
+        {
+            category: "Berpikir Kritis",
+            question: "Argumen: 'Bermain video game memicu tindak kekerasan pada remaja.' Bukti manakah yang paling kuat untuk <b>memperlemah</b> argumen ini?",
+            options: [
+                "A. Beberapa pelaku kekerasan diketahui sering bermain game.",
+                "B. Studi sosiologi selama 10 tahun menunjukkan tingkat kejahatan remaja menurun saat penjualan game meningkat pesat.",
+                "C. Remaja yang tidak bermain game sering membaca buku.",
+                "D. Banyak game yang memiliki rating untuk dewasa."
+            ],
+            answer: 1
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "'Pemerintah harus melarang kantong plastik karena merusak lingkungan.' Asumsi yang mendasari pernyataan ini adalah...",
+            options: [
+                "A. Pemerintah adalah satu-satunya pihak yang bertanggung jawab atas lingkungan.",
+                "B. Kantong plastik adalah satu-satunya perusak lingkungan.",
+                "C. Melarang penggunaan kantong plastik akan berdampak positif pada pelestarian lingkungan.",
+                "D. Masyarakat tidak bisa dididik untuk membuang sampah pada tempatnya."
+            ],
+            answer: 2
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Manakah dari pernyataan berikut yang merupakan contoh kelemahan logika (fallacy) <i>Ad Hominem</i>?",
+            options: [
+                "A. 'Kita harus menolak gagasan perbaikan ekonomi darinya, karena dia pernah dipenjara kasus penipuan.'",
+                "B. 'Jika kita membiarkan siswa libur sehari, mereka akan menuntut libur sebulan penuh.'",
+                "C. 'Banyak orang menggunakan produk ini, berarti produk ini pasti bagus.'",
+                "D. 'Karena kamu gagal ujian, kamu tidak berhak memberi saran cara belajar.'"
+            ],
+            answer: 0
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Sebuah perusahaan memotong anggaran iklannya 50%, dan pada kuartal yang sama penjualannya turun. CEO menyimpulkan penurunan anggaran iklan adalah penyebab turunnya penjualan. Penjelasan alternatif apa yang harus dievaluasi oleh pemikir kritis?",
+            options: [
+                "A. Apakah pesaing mengeluarkan produk baru yang lebih inovatif pada saat yang sama?",
+                "B. Apakah ada krisis ekonomi global yang menurunkan daya beli masyarakat secara umum?",
+                "C. Keduanya (A dan B) adalah penjelasan alternatif yang valid.",
+                "D. Tidak ada alternatif lain, CEO sudah pasti benar."
+            ],
+            answer: 2
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Data menunjukkan: Di bulan Juli, tingkat konsumsi es krim meningkat tajam bersamaan dengan meningkatnya kasus orang tenggelam. Kesimpulan kausalitas apa yang salah dari data ini?",
+            options: [
+                "A. Musim panas menyebabkan orang banyak makan es krim dan berenang.",
+                "B. Memakan es krim menyebabkan seseorang tenggelam.",
+                "C. Tidak ada korelasi langsung antara es krim dan orang tenggelam, hanya kebetulan faktor waktu.",
+                "D. Orang tenggelam biasanya karena kram otot."
+            ],
+            answer: 1
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Saat dihadapkan pada informasi viral di media sosial tentang khasiat daun X untuk menyembuhkan segala penyakit, sikap kritis yang paling tepat adalah...",
+            options: [
+                "A. Segera membagikannya ke grup keluarga agar semua sehat.",
+                "B. Mengabaikannya sama sekali karena semua info di media sosial adalah bohong.",
+                "C. Mencari referensi dari jurnal medis atau situs kesehatan resmi (seperti WHO) mengenai daun X.",
+                "D. Membeli daun tersebut dan mencobanya sendiri sebagai bahan eksperimen."
+            ],
+            answer: 2
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Bias konfirmasi (Confirmation Bias) adalah kelemahan berpikir kritis di mana seseorang...",
+            options: [
+                "A. Cenderung mencari dan mempercayai informasi yang mendukung keyakinan awalnya saja.",
+                "B. Menganggap dirinya lebih pintar dari orang lain secara tidak berdasar.",
+                "C. Memutuskan sesuatu berdasarkan emosi sesaat.",
+                "D. Meniru keputusan mayoritas demi rasa aman."
+            ],
+            answer: 0
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Dilema etis: Mengalokasikan dana terbatas untuk pengobatan mahal 1 pasien penyakit langka, atau menggunakannya untuk vaksinasi 1000 anak. Analisis mana yang menggunakan pendekatan <i>Utilitarianisme</i> (manfaat terbesar untuk jumlah terbanyak)?",
+            options: [
+                "A. Mengobati 1 pasien karena nyawa manusia tidak bisa diukur angka.",
+                "B. Memilih vaksinasi 1000 anak karena menghasilkan pencegahan penderitaan bagi lebih banyak orang.",
+                "C. Membagi dana menjadi dua, yang berarti tidak ada pasien yang sembuh total.",
+                "D. Meminta donasi tambahan dari masyarakat."
+            ],
+            answer: 1
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Pernyataan: 'Orang yang sukses biasanya bangun pukul 4 pagi. Direktur Y bangun pukul 4 pagi, jadi dia pasti sangat sukses.' Ini adalah contoh sesat pikir yang disebut...",
+            options: [
+                "A. Generalisasi yang terburu-buru (Hasty Generalization).",
+                "B. Memutarbalikkan fakta (Strawman).",
+                "C. Kesesatan kausalitas palsu.",
+                "D. Bias kelangsungan hidup (Survivor Bias)."
+            ],
+            answer: 0
+        },
+        {
+            category: "Berpikir Kritis",
+            question: "Untuk menilai objektivitas suatu kebijakan sekolah yang baru diimplementasikan, sumber data manakah yang <b>paling kuat</b> dan dapat diandalkan?",
+            options: [
+                "A. Keluhan beberapa siswa yang diposting di media sosial.",
+                "B. Opini subjektif kepala sekolah pada saat rapat komite.",
+                "C. Perbandingan statistik angka kehadiran dan nilai rata-rata siswa sebelum dan satu tahun sesudah kebijakan diterapkan.",
+                "D. Jajak pendapat singkat (polling) tanpa metode yang jelas di grup chat guru."
+            ],
+            answer: 2
+        }
+    ];
+
+    const questionsContainer = document.getElementById('questions-container');
+
+    // Render Pertanyaan
+    quizData.forEach((q, index) => {
+        let catClass = '';
+        if(q.category === 'Literasi') catClass = 'cat-literasi';
+        if(q.category === 'Logika') catClass = 'cat-logika';
+        if(q.category === 'Berpikir Kritis') catClass = 'cat-kritis';
+
+        let html = `
+            <div class="question-card" id="q${index}">
+                <span class="category-badge ${catClass}">${q.category}</span>
+                <div class="question-title">${index + 1}. ${q.question}</div>
+                <div class="options">
+        `;
+        
+        q.options.forEach((opt, optIndex) => {
+            html += `
+                <label>
+                    <input type="radio" name="q${index}" value="${optIndex}">
+                    ${opt}
+                </label>
+            `;
+        });
+
+        html += `</div></div>`;
+        questionsContainer.innerHTML += html;
+    });
+
+    function calculateScore() {
+        let score = 0;
+        let unanswered = 0;
+
+        quizData.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected) {
+                if (parseInt(selected.value) === q.answer) {
+                    score++;
+                }
+            } else {
+                unanswered++;
+            }
+        });
+
+        if (unanswered > 0) {
+            alert(`Ada ${unanswered} pertanyaan yang belum dijawab. Harap selesaikan semua pertanyaan.`);
+            return;
+        }
+
+        const percentage = Math.round((score / 30) * 100);
+        document.getElementById('score-display').innerText = `${score} / 30`;
+        
+        let feedback = "";
+        if (percentage >= 85) {
+            feedback = `<b>Sangat Baik (${percentage}%)</b> - Penguasaan literasi, logika, dan berpikir kritis di tingkat yang sangat memadai.`;
+        } else if (percentage >= 70) {
+            feedback = `<b>Baik (${percentage}%)</b> - Kemampuan dasar sudah solid, namun ada ruang untuk analitis yang lebih tajam.`;
+        } else if (percentage >= 50) {
+            feedback = `<b>Cukup (${percentage}%)</b> - Disarankan untuk lebih sering berlatih soal skolastik dan evaluasi literatur.`;
+        } else {
+            feedback = `<b>Kurang (${percentage}%)</b> - Perlu pendalaman serius terhadap metode penalaran dasar dan membaca kritis.`;
+        }
+
+        document.getElementById('feedback-display').innerHTML = feedback;
+        document.getElementById('result-container').style.display = 'block';
+        
+        // Scroll ke hasil
+        document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
